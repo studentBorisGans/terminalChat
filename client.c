@@ -51,7 +51,7 @@ int main() {
             close(client_socket);
             exit(EXIT_FAILURE);
         }
-        buffer[1024] = "";
+        // buffer[1024] = "";
 
         bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
         if (bytes_received < 0) {
