@@ -17,6 +17,7 @@ int main() {
     struct sockaddr_in server_addr;
     char buffer[BUFF_SIZE];
     int bytes_received;
+    int aaa;
 
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket == -1) {
