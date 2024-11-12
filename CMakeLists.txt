@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 project(TerminalChat VERSION 1.0)
 
 # Set the C standard (e.g., C11)
-set(CMAKE_C_STANDARD 11)
+set(CMLAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 # Create an executable from the source files
