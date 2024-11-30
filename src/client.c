@@ -209,7 +209,16 @@ int main(int argc, char *argv[])
         {
             if (strcmp(buffer, "/help") == 0)
             {
-                printf("Commands:\n/help - Show this menu\n/exit - Leave the room\n");
+                printf("Commands:\n/help - Show this menu\n/exit - Leave the room\n/dm <username> <message> - Send a private message\n");
+                continue;
+            }
+            else if (strncmp(buffer, "/dm ", 4) == 0)
+            {
+                // Send DM command to the server
+                if (send(client_socket, buffer, strlen(buffer), 0) < 0)
+                {
+                    perror("Failed to send DM command");
+                }
                 continue;
             }
             else if (strcmp(buffer, "/exit") == 0)
@@ -224,7 +233,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        // Send message to the server
+        // Send regular message to the server
         if (send(client_socket, buffer, strlen(buffer), 0) < 0)
         {
             perror("Message send failed");

@@ -20,6 +20,7 @@ set(CLIENT_SRC
 set(SERVER_SRC
     src/server.c
     src/network_utils.c
+    src/chat_room.c # Add this file
 )
 
 # Add executables for the client and server

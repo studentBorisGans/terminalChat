@@ -2,30 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 #include <pthread.h>
+#include <arpa/inet.h>
 #include <time.h>
 #include "network_utils.h" // For getting local IPs
 #include "common.h"        // Shared constants and macros
+#include "chat_room.h"     // Include the ChatRoom definition
 
 #define MAX_CHAT_ROOMS 5
 #define MAX_USERS_PER_ROOM 10
 
-typedef struct ChatRoom
+typedef struct User
 {
-    char name[50];
-    int is_private;
-    char password[50];
-    int user_count;
-    int client_sockets[MAX_USERS_PER_ROOM]; // Sockets for broadcasting
-    char users[MAX_USERS_PER_ROOM][50];     // List of usernames
-} ChatRoom;
+    char username[50];
+    int socket;
+    struct User *next;
+} User;
 
-// Global array of chat rooms
-ChatRoom chat_rooms[MAX_CHAT_ROOMS] = {
-    {"General", 0, "", 0},      // Public room
-    {"Devs Only", 1, "1234", 0} // Private room
-};
+// Global linked list of users
+User *user_list = NULL;
+pthread_mutex_t user_list_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Mutex for thread-safe updates to chat rooms
 pthread_mutex_t room_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -38,87 +34,133 @@ void get_timestamp(char *buffer, size_t size)
     snprintf(buffer, size, "[%02d:%02d:%02d]", t->tm_hour, t->tm_min, t->tm_sec);
 }
 
-// Function to display chat rooms to the client
-void send_chat_rooms(int client_socket)
+// Function to add a user to the user list
+void add_user(const char *username, int socket)
 {
-    char room_list[BUFF_SIZE] = "Available Chat Rooms:\n";
-    strcat(room_list, "---------------------------------\n");
-    for (int i = 0; i < MAX_CHAT_ROOMS; i++)
-    {
-        if (strlen(chat_rooms[i].name) > 0)
-        {
-            char room_info[100];
-            snprintf(room_info, sizeof(room_info), "%d. %s (%s) - %d users\n", i + 1, chat_rooms[i].name,
-                     chat_rooms[i].is_private ? "Private" : "Public", chat_rooms[i].user_count);
-            strcat(room_list, room_info);
-        }
-    }
-    strcat(room_list, "---------------------------------\n");
-    send(client_socket, room_list, strlen(room_list), 0);
+    pthread_mutex_lock(&user_list_mutex);
+    User *new_user = (User *)malloc(sizeof(User));
+    strncpy(new_user->username, username, sizeof(new_user->username) - 1);
+    new_user->username[sizeof(new_user->username) - 1] = '\0';
+    new_user->socket = socket;
+    new_user->next = user_list;
+    user_list = new_user;
+    pthread_mutex_unlock(&user_list_mutex);
 }
 
-// Function to add a user to a chat room
-int add_user_to_room(ChatRoom *room, int client_socket, const char *username)
+// Function to remove a user from the user list
+void remove_user(int socket)
 {
-    pthread_mutex_lock(&room_mutex);
-    if (room->user_count >= MAX_USERS_PER_ROOM)
-    {
-        pthread_mutex_unlock(&room_mutex);
-        return -1; // Room is full
-    }
-    room->client_sockets[room->user_count] = client_socket;
-    strcpy(room->users[room->user_count], username);
-    room->user_count++;
-    pthread_mutex_unlock(&room_mutex);
-    return 0;
-}
+    pthread_mutex_lock(&user_list_mutex);
+    User *prev = NULL, *curr = user_list;
 
-// Function to remove a user from a chat room
-void remove_user_from_room(ChatRoom *room, int client_socket)
-{
-    pthread_mutex_lock(&room_mutex);
-    for (int i = 0; i < room->user_count; i++)
+    while (curr != NULL)
     {
-        if (room->client_sockets[i] == client_socket)
+        if (curr->socket == socket)
         {
-            for (int j = i; j < room->user_count - 1; j++)
+            if (prev == NULL)
             {
-                room->client_sockets[j] = room->client_sockets[j + 1];
-                strcpy(room->users[j], room->users[j + 1]);
+                user_list = curr->next;
             }
-            room->user_count--;
+            else
+            {
+                prev->next = curr->next;
+            }
+            free(curr);
             break;
         }
+        prev = curr;
+        curr = curr->next;
     }
-    pthread_mutex_unlock(&room_mutex);
+
+    pthread_mutex_unlock(&user_list_mutex);
 }
 
-// Function to broadcast messages to all clients in a room
-void broadcast_message(ChatRoom *room, int sender_socket, const char *message)
+// Function to find a user by username
+User *find_user(const char *username)
 {
-    pthread_mutex_lock(&room_mutex);
-    for (int i = 0; i < room->user_count; i++)
+    pthread_mutex_lock(&user_list_mutex);
+    User *curr = user_list;
+
+    while (curr != NULL)
     {
-        int client_socket = room->client_sockets[i];
-        if (client_socket != sender_socket) // Skip the sender
+        if (strcmp(curr->username, username) == 0)
         {
-            send(client_socket, message, strlen(message), 0);
+            pthread_mutex_unlock(&user_list_mutex);
+            return curr;
+        }
+        curr = curr->next;
+    }
+
+    pthread_mutex_unlock(&user_list_mutex);
+    return NULL;
+}
+
+// Function to send a direct message
+void handle_dm(int sender_socket, const char *sender_username, const char *target_username, const char *message)
+{
+    User *target_user = find_user(target_username);
+
+    if (target_user != NULL)
+    {
+        char dm_message[BUFF_SIZE];
+        snprintf(dm_message, sizeof(dm_message), "[DM from %s]: %s\n", sender_username, message);
+        send(target_user->socket, dm_message, strlen(dm_message), 0);
+    }
+    else
+    {
+        const char *error_message = "User not found.\n";
+        send(sender_socket, error_message, strlen(error_message), 0);
+    }
+}
+
+// Function to handle commands
+void handle_command(ChatRoom *room, int client_socket, const char *username, const char *command)
+{
+    char buffer[BUFF_SIZE];
+
+    if (strncmp(command, "/dm ", 4) == 0)
+    {
+        char target_username[50];
+        const char *message = strchr(command + 4, ' ');
+
+        if (message != NULL)
+        {
+            strncpy(target_username, command + 4, message - (command + 4));
+            target_username[message - (command + 4)] = '\0';
+            message++; // Skip the space
+
+            handle_dm(client_socket, username, target_username, message);
+        }
+        else
+        {
+            const char *error_message = "Invalid DM format. Use /dm <username> <message>\n";
+            send(client_socket, error_message, strlen(error_message), 0);
         }
     }
-    pthread_mutex_unlock(&room_mutex);
-}
-
-// Function to list users in a room
-void list_users_in_room(ChatRoom *room, char *buffer)
-{
-    pthread_mutex_lock(&room_mutex);
-    strcpy(buffer, "Active users:\n");
-    for (int i = 0; i < room->user_count; i++)
+    else if (strcmp(command, "/help") == 0)
     {
-        strcat(buffer, room->users[i]);
-        strcat(buffer, "\n");
+        const char *help_message = "Commands:\n/help - Show this menu\n/exit - Leave the room\n/users - List active users\n/dm <username> <message> - Send a private message\n";
+        send(client_socket, help_message, strlen(help_message), 0);
     }
-    pthread_mutex_unlock(&room_mutex);
+    else if (strcmp(command, "/users") == 0)
+    {
+        char user_list[BUFF_SIZE];
+        list_users_in_room(room, user_list);
+        send(client_socket, user_list, strlen(user_list), 0);
+    }
+    else if (strcmp(command, "/exit") == 0)
+    {
+        snprintf(buffer, sizeof(buffer), "%s has left the chat.\n", username);
+        broadcast_message(room, client_socket, buffer);
+        remove_user_from_room(room, client_socket);
+        close(client_socket);
+        pthread_exit(NULL);
+    }
+    else
+    {
+        const char *error_message = "Unknown command\n";
+        send(client_socket, error_message, strlen(error_message), 0);
+    }
 }
 
 // Function to handle a single client
@@ -139,6 +181,8 @@ void *handle_client(void *arg)
         return NULL;
     }
     username[bytes_received] = '\0'; // Null-terminate username
+    add_user(username, client_socket);
+
     printf("User connected: %s\n", username);
 
     // Send chat rooms to client
@@ -186,38 +230,19 @@ void *handle_client(void *arg)
     {
         buffer[bytes_received] = '\0'; // Null-terminate message
 
-        if (strncmp(buffer, "/", 1) == 0) // Handle commands
+        if (buffer[0] == '/') // Command
         {
-            if (strcmp(buffer, "/help") == 0)
-            {
-                const char *help_message = "Commands:\n/help - Show this menu\n/exit - Leave the room\n/users - List active users\n";
-                send(client_socket, help_message, strlen(help_message), 0);
-            }
-            else if (strcmp(buffer, "/users") == 0)
-            {
-                char user_list[BUFF_SIZE];
-                list_users_in_room(room, user_list);
-                send(client_socket, user_list, strlen(user_list), 0);
-            }
-            else if (strcmp(buffer, "/exit") == 0)
-            {
-                snprintf(join_message, sizeof(join_message), "%s has left the chat.\n", username);
-                broadcast_message(room, -1, join_message);
-                break;
-            }
-            else
-            {
-                send(client_socket, "Unknown command\n", 16, 0);
-            }
-            continue;
+            handle_command(room, client_socket, username, buffer);
         }
-
-        // Broadcast message to the room
-        char chat_message[BUFF_SIZE];
-        snprintf(chat_message, sizeof(chat_message), "[%s]: %s\n", username, buffer);
-        broadcast_message(room, client_socket, chat_message);
+        else
+        {
+            char chat_message[BUFF_SIZE];
+            snprintf(chat_message, sizeof(chat_message), "[%s]: %s\n", username, buffer);
+            broadcast_message(room, client_socket, chat_message);
+        }
     }
 
+    remove_user(client_socket);
     remove_user_from_room(room, client_socket);
     close(client_socket);
     printf("User %s disconnected from room: %s\n", username, room->name);
