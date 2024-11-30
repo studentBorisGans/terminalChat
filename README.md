@@ -1,6 +1,6 @@
 ### **README.md**
 
-```markdown
+
 # Terminal Chat Application
 
 This project is a simple terminal-based chat application that allows multiple clients to communicate with a server over a TCP connection. It is lightweight and designed for ease of use.
