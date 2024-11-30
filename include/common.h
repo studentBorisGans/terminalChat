@@ -6,7 +6,7 @@
 
 // Buffer size for message transmission
 #define BUFF_SIZE 1024
-
+#define MAX_CHAT_ROOMS 5
 // Macros for log levels (optional, for enhanced debugging)
 #define LOG_INFO(msg) printf("[INFO]: %s\n", msg)
 #define LOG_ERROR(msg) fprintf(stderr, "[ERROR]: %s\n", msg)
