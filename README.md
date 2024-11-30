@@ -1,5 +1,3 @@
-### **README.md**
-
 
 # Terminal Chat Application
 
