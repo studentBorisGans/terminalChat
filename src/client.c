@@ -4,11 +4,10 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <arpa/inet.h>
-#include <termios.h>       // For masking password input
-#include "network_utils.h" // For hostname resolution
-#include "common.h"        // Shared constants and macros
+#include <termios.h>
+#include "network_utils.h"
+#include "common.h"
 
-// Global client socket
 int client_socket;
 
 // Function to mask password input
@@ -45,11 +44,11 @@ int get_valid_input(int min, int max)
         {
             printf("Invalid input. Please select a valid option.\n");
             while (getchar() != '\n')
-                ; // Clear the input buffer
+                ;
         }
         else
         {
-            getchar(); // Consume newline character
+            getchar(); // eat newline character
             return choice;
         }
     }
@@ -61,7 +60,6 @@ void clear_current_line()
     printf("\033[2K\r"); // ANSI escape code to clear line
 }
 
-// Thread function to receive messages from the server
 void *receive_messages(void *arg)
 {
     char buffer[BUFF_SIZE];
@@ -71,10 +69,10 @@ void *receive_messages(void *arg)
     {
         buffer[bytes_received] = '\0';
 
-        // Save the current line, display the message, and restore the prompt
+        // save the current line, display the message, and restore the prompt
         clear_current_line();
-        printf("%s\n", buffer); // Display received message
-        printf("> ");           // Redraw the input prompt
+        printf("%s\n", buffer); // display received message
+        printf("> ");           // rewrite the input prompt
         fflush(stdout);
     }
 
@@ -139,7 +137,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Connect to the server
     printf("Connecting to server...\n");
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
@@ -148,7 +145,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Send username to the server
     send(client_socket, username, strlen(username), 0);
 
     printf("Connected to server as %s.\n", username);

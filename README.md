@@ -26,7 +26,7 @@ TerminalChat is a multi-client, server-based chat application that allows users 
 ### Setup and Build
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/studentBorisGans/terminalChat.git
    cd terminalChat
    ```
 

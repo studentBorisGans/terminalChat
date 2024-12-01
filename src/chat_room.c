@@ -1,7 +1,7 @@
 #include "chat_room.h"
 #include <sys/socket.h> // For send
 #include <string.h>     // For strlen
-#include <stdio.h>      // Optional for debugging
+#include <stdio.h>
 #include "common.h"
 
 void send_chat_rooms(int client_socket)
@@ -10,7 +10,7 @@ void send_chat_rooms(int client_socket)
     strcat(room_list, "---------------------------------\n");
     for (int i = 0; i < MAX_CHAT_ROOMS; i++)
     {
-        if (strlen(chat_rooms[i].name) > 0) // Skip empty rooms
+        if (strlen(chat_rooms[i].name) > 0) // skip empty rooms
         {
             char room_info[100];
             snprintf(room_info, sizeof(room_info), "%d. %s (%s) - %d users\n", i + 1, chat_rooms[i].name,
@@ -56,7 +56,7 @@ void broadcast_message(ChatRoom *room, int sender_socket, const char *message)
     for (int i = 0; i < room->user_count; i++)
     {
         int client_socket = room->client_sockets[i];
-        if (client_socket != sender_socket) // Skip the sender
+        if (client_socket != sender_socket) // skip the sender
         {
             send(client_socket, message, strlen(message), 0);
         }
@@ -72,7 +72,7 @@ void list_users_in_room(ChatRoom *room, char *buffer)
         strcat(buffer, "\n");
     }
 }
-// Define the global chat_rooms array
+//  global chat_rooms array
 ChatRoom chat_rooms[MAX_CHAT_ROOMS] = {
     {"General", 0, "", 0},      // Public room
     {"Devs Only", 1, "1234", 0} // Private room

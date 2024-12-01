@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #include <sys/socket.h> // For send
-#include "chat_room.h"  // Include ChatRoom structure and related constants
+#include "chat_room.h"
 
 // Default port for the server and client
 #define PORT 8000
