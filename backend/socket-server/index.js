@@ -2,19 +2,19 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const userMap = new Map(); // Maps socket.id to username
+const userMap = new Map(); 
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://172.16.2.102:3000", // Only allow your frontend to connect
+    origin: "http://172.16.2.102:3000", 
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
-    credentials: true, // If you're handling cookies or credentials
+    credentials: true, 
   },
-  transports: ['websocket', 'polling'], // Enable both WebSocket and polling transports
+  transports: ['websocket', 'polling'], 
 });
 
 // Middleware
@@ -23,12 +23,16 @@ app.use(express.json());
 
 // Store messages in memory (for simplicity)
 let messages = [];
-let rooms = [
+// Backend logic for private rooms
+const rooms = [
   { name: 'General', isPrivate: false },
-  { name: 'Devs Only', isPrivate: true },
+  { name: 'Devs Only', isPrivate: true, password: 'devs123' }, // Add a password for private rooms
+  { name: 'School', isPrivate: true, password: 'password' } 
 ];
 
-// Test route to verify server is running
+
+
+
 app.get('/', (req, res) => {
   res.send('Hello from the server!');
 });
@@ -54,10 +58,22 @@ io.on('connection', (socket) => {
   });
 
   // Handle joining a room
-  socket.on('joinRoom', (room) => {
-    socket.join(room);
-    console.log(`User ${socket.id} joined room: ${room}`);
-  });
+
+socket.on('joinRoom', (data) => {
+  const { roomName, password } = data;
+  const room = rooms.find((r) => r.name === roomName);
+
+  if (room.isPrivate && room.password !== password) {
+    socket.emit('error', 'Incorrect password');
+    return;
+  }
+
+  // Join the room
+  socket.join(roomName);
+  console.log(`User ${socket.id} joined room: ${roomName}`);
+  socket.emit('roomJoined'); // Emit confirmation to client
+});
+
 
   // Handle incoming messages
   socket.on('message', (msg) => {

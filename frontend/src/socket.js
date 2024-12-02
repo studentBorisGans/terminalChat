@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
-// Use your machine's actual IP address or a public URL accessible by the frontend
-const SOCKET_URL = 'http://172.16.2.102:8001'; // Add the protocol (http:// or https://) and port
+
+const SOCKET_URL = 'http://172.16.2.102:8001'; // backend server URL
 
 const socket = io(SOCKET_URL, {
   transports: ['websocket'], // Specify transports

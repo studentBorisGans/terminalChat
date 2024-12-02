@@ -1,43 +1,209 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  width: 100%; /* Full viewport width */
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Chat container styles */
+.Chat {
+  display: flex;
+  flex-direction: column;
+  width: 400px; /* Fixed width */
+  height: 100vh; /* Take up full height */
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Add padding to individual elements inside the Chat container */
+.Chat > * {
+  padding: 15px;
+}
+
+/* Message list styling */
+.MessageList {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Message item styling */
+.MessageItem {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  max-width: 80%;
+  padding: 10px;
+  border-radius: 8px;
+  word-wrap: break-word;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+/* Current user's messages */
+.MessageItem.currentUser {
+  align-self: flex-end;
+  background-color: #e1f7d5;
+  border: 1px solid #ddd;
+}
+
+/* Other users' messages */
+.MessageItem:not(.currentUser) {
+  align-self: flex-start;
+  background-color: #e1e1e1;
+  border: 1px solid #ddd;
+}
+
+/* Username (sender) styling */
+.MessageItem .sender {
+  font-weight: bold;
+  font-size: 12px;
+  position: absolute;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background-color: #ffffff; /* Adds contrast to the username */
+}
+
+/* Current user's username position */
+.MessageItem.currentUser .sender {
+  top: 5px;
+  left: 10px;
+}
+
+/* Other users' username position */
+.MessageItem:not(.currentUser) .sender {
+  top: 5px;
+  right: 10px;
+}
+
+/* Message text styling */
+.MessageItem .text {
+  color: #555;
+  margin-top: 20px; /* Adds space for the username */
+}
+
+/* Message input box styling */
+.MessageInput {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.MessageInput input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-right: 10px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.MessageInput input:focus {
+  border-color: #007bff;
+}
+
+.MessageInput button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.MessageInput button:hover {
+  background-color: #0056b3;
+}
+
+/* Chat room list styling */
 .ChatRoom {
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin: 20px auto;
-  }
-  
-  .ChatRoom h2 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  .ChatRoom ul {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 10px;
-  }
-  
-  .ChatRoom li {
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .ChatRoom li:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .ChatRoom li:last-child {
-    margin-bottom: 0;
-  }
-  
-  .ChatRoom .error {
-    color: red;
-    font-size: 14px;
-    text-align: center;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ChatRoom h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.ChatRoom ul {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.ChatRoom li {
+  padding: 10px;
+  background-color: #f1f1f1;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ChatRoom li:hover {
+  background-color: #e0e0e0;
+}
+
+.ChatRoom .error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Password prompt styling */
+.passwordPrompt {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.passwordPrompt input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 10px;
+  outline: none;
+  font-size: 14px;
+}
+
+.passwordPrompt button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.passwordPrompt button:hover {
+  background-color: #0056b3;
+}
