@@ -1,0 +1,4 @@
+/Users/borisgans/IE/programming/terminalChat/src/CMakeFiles/Client.dir
+/Users/borisgans/IE/programming/terminalChat/src/CMakeFiles/Server.dir
+/Users/borisgans/IE/programming/terminalChat/src/CMakeFiles/edit_cache.dir
+/Users/borisgans/IE/programming/terminalChat/src/CMakeFiles/rebuild_cache.dir
