@@ -1,0 +1,129 @@
+/* Main container for the message list */
+.MessageList {
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+  }
+  
+  /* Scrollbar style */
+  .MessageList::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .MessageList::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  
+  .MessageList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  /* Individual message styling */
+  .MessageList .MessageItem {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    max-width: 80%;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    word-wrap: break-word;
+  }
+  
+  /* Current user message - align left */
+  .MessageList .MessageItem.currentUser {
+    background-color: #e0f7fa;
+    color: #00796b;
+    justify-content: flex-start;
+  }
+  
+  /* Other users' messages - align right */
+  .MessageList .MessageItem:not(.currentUser) {
+    background-color: #eceff1;
+    color: #607d8b;
+    justify-content: flex-end;
+  }
+  
+  /* Sender name styling */
+  .MessageList .sender {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #00796b;
+  }
+  
+  /* Message text styling */
+  .MessageList .text {
+    color: #4a4a4a;
+    word-wrap: break-word;
+    display: inline-block;
+    max-width: 80%;
+  }
+  
+  /* No messages text */
+  .MessageList .noMessages {
+    text-align: center;
+    color: #888;
+    margin-top: 20px;
+    font-style: italic;
+  }
+  
+  /* System messages styling */
+  .MessageList .systemMessage {
+    color: #777;
+    font-size: 12px;
+    text-align: center;
+    margin: 10px 0;
+    font-style: italic;
+  }
+  
+  /* Hover effect for messages */
+  .MessageList .MessageItem:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+  
+  /* Styling for the input container and button */
+  .MessageInput {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .MessageInput input {
+    width: 85%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 14px;
+    outline: none;
+  }
+  
+  .MessageInput button {
+    padding: 10px 15px;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .MessageInput button:hover {
+    background-color: #004d40;
+  }
+  

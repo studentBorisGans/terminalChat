@@ -1,0 +1,160 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  width: 100%; /* Full width */
+}
+
+/* Chat container styles */
+.Chat {
+  display: flex;
+  flex-direction: column;
+  width: 400px; /* Fixed width */
+  height: 100vh; /* Take up full height */
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Add padding to the individual elements inside the Chat container */
+.Chat > * {
+  padding: 15px;
+}
+
+/* Message list style */
+.Chat > .MessageList {
+  flex: 1;
+  max-height: calc(100vh - 160px); /* Adjust based on the height of the input bar and room selector */
+  overflow-y: auto;
+  padding-right: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Message styling */
+.MessageItem {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  max-width: 80%;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+  word-wrap: break-word;
+  position: relative; /* Added for positioning the username */
+  transition: background-color 0.3s ease;
+}
+
+.MessageItem.currentUser {
+  align-self: flex-end;
+  background-color: #e1f7d5;
+  border: 1px solid #ddd;
+}
+
+.MessageItem:not(.currentUser) {
+  align-self: flex-start;
+  background-color: #e1e1e1;
+  border: 1px solid #ddd;
+}
+
+/* Username (sender) styling */
+.MessageItem .sender {
+  font-weight: bold;
+  color: #333;
+  position: absolute; /* Position it absolutely within the message */
+  font-size: 12px;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+/* Position for current user's username (top-left corner) */
+.MessageItem.currentUser .sender {
+  top: 5px;
+  left: 10px;
+  background-color: #ffffff; /* Optional: Adds contrast to the username */
+}
+
+/* Position for other users' username (top-right corner) */
+.MessageItem:not(.currentUser) .sender {
+  top: 5px;
+  right: 10px;
+  background-color: #ffffff; /* Optional: Adds contrast to the username */
+}
+
+/* Message text styling */
+.MessageItem .text {
+  color: #555;
+  margin-top: 2px; /* Adds space for the username */
+}
+
+/* Message input box styling */
+.MessageInput {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.MessageInput input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-right: 10px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.MessageInput input:focus {
+  border-color: #007bff;
+}
+
+.MessageInput button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.MessageInput button:hover {
+  background-color: #0056b3;
+}
+
+.ChatRoom ul {
+  padding: 0;
+  margin: 0;
+}
+
+.ChatRoom li {
+  padding: 10px;
+  background-color: #f1f1f1;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.ChatRoom li:hover {
+  background-color: #e0e0e0;
+}
+
+.ChatRoom .error {
+  color: red;
+  margin-top: 10px;
+}
